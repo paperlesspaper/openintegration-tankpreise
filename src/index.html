@@ -207,7 +207,7 @@
     };
 
     // Handling Settings Page Updates
-    window.addEventListener("message", (event) => {
+    window.addEventListener("message", async (event) => {
       const data = event.data;
 
       if (!data) {
@@ -231,12 +231,12 @@
             "Received INIT message without tankerkoenig_station_id in pluginSettings.";
         }
 
-        fetchPrices(
+        await fetchPrices(
           payload.meta.pluginSettings.tankerkoenig_api_key,
           payload.meta.pluginSettings.tankerkoenig_station_id,
         );
 
-        fetchStationDetails(
+        await fetchStationDetails(
           payload.meta.pluginSettings.tankerkoenig_api_key,
           payload.meta.pluginSettings.tankerkoenig_station_id,
         );
