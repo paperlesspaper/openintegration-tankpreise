@@ -44,23 +44,25 @@
       }
 
       .title {
-        font-size: clamp(2rem, 1.4vw + 0.8rem, 3rem);
+        font-size: 3rem;
         font-weight: 600;
         text-align: center;
         margin: 0 0 0.2rem 0;
         color: #0000ff;
+        word-break: break-all;
       }
 
       .subtitle {
-        font-size: clamp(1.2rem, 0.9vw + 0.6rem, 1.8rem);
+        font-size: 2rem;
         opacity: 0.75;
         text-align: center;
         margin: 0 0 0.2rem 0;
+        opacity: 0.8;
       }
 
       #clock {
-        font-size: clamp(0.5rem, 0.5vw + 0.2rem, 0.8rem);
-        color: #ff0000;
+        font-size: 1rem;
+        color: #ffff00;
         text-align: center;
         margin: 5rem 0 0.2rem 0;
       }
@@ -86,12 +88,13 @@
         right: 0;
         text-align: center;
         color: #ff0000;
+        font-size: 1rem;
       }
 
       .icon {
         display: flex;
         justify-content: center;
-        margin: 4rem;
+        margin: 3rem;
         color: #0000ff;
       }
 
@@ -99,7 +102,11 @@
         display: block;
         margin: 2rem auto;
         width: fit-content;
-        font-size: clamp(1rem, 0.8vw + 0.4rem, 1.5rem);
+        font-size: 2rem;
+      }
+
+      .price-block p {
+        margin: 0.75rem 0;
       }
     </style>
   </head>
@@ -109,13 +116,13 @@
     <main class="screen">
       <section>
         <div id="warning"></div>
-        <h1 class="title">Tankpreise Aktuell</h1>
+        <h1 class="title">Hellschen-Heringsand-Unterschaar</h1>
         <h2 class="subtitle">Aktuelle Benzinpreise in Deutschland</h2>
         <div class="icon">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="64"
-            height="64"
+            width="96"
+            height="96"
             fill="currentColor"
             viewBox="0 0 256 256"
           >
@@ -125,9 +132,9 @@
           </svg>
         </div>
         <div class="price-block">
-          <p class="super-e5"></p>
-          <p class="super-e10"></p>
-          <p class="diesel"></p>
+          <p class="super-e5">Super E5: <strong>1.969 €</strong></p>
+          <p class="super-e10">Super E10: <strong>1.929 €</strong></p>
+          <p class="diesel">Diesel: <strong>1.849 €</strong></p>
         </div>
         <h4 id="clock">00:00</h4>
       </section>
