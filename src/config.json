@@ -1,0 +1,24 @@
+{
+  "name": "Tankepreise Aktuell",
+  "version": "1.0.0",
+  "description": "Ein einfaches Plugin zur Anzeige aktueller Benzinpreise in Deutschland.",
+  "nativeSettings": {
+    "orientation": "portrait"
+  },
+  "formSchema": {
+    "type": "object",
+    "properties": {
+      "tankerkoenig_api_key": {
+        "type": "string",
+        "description": "Der API-Schlüssel für den Zugriff auf Tankerkoenig-Daten.",
+        "default": "your-api-key-here"
+      },
+      "tankerkoenig_station_id": {
+        "type": "string",
+        "description": "Die ID der Tankerkoenig-Station, für die die Preise abgerufen werden sollen.",
+        "default": "your-station-id-here"
+      }
+    }
+  },
+  "renderPage": "./index.html"
+}

@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Openintegration: Hello World</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        background: #fff;
+        color: #000;
+      }
+
+      .screen {
+        width: 100vw;
+        height: 100vh;
+        padding: 1.3em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .title {
+        font-size: clamp(1rem, 1.4vw + 0.8rem, 2rem);
+        font-weight: 600;
+        text-align: center;
+        margin: 0 0 0.2rem 0;
+      }
+
+      .subtitle {
+        font-size: clamp(0.9rem, 0.9vw + 0.6rem, 1.3rem);
+        opacity: 0.75;
+        text-align: center;
+        margin: 0 0 0.2rem 0;
+      }
+
+      #clock {
+        font-size: clamp(0.5rem, 0.5vw + 0.2rem, 0.8rem);
+        opacity: 0.25;
+        text-align: center;
+        margin: 5rem 0 0.2rem 0;
+      }
+
+      .hidden-marker {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+      }
+
+      #warning {
+        max-width: 100vw;
+        margin: 0.5em;
+        white-space: normal;
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
+        color: crimson;
+      }
+
+      .icon {
+        display: flex;
+        justify-content: center;
+        margin: 4rem;
+      }
+
+      .price-block {
+        display: block;
+        margin: 2rem auto;
+        width: fit-content;
+        font-size: clamp(0.8rem, 0.8vw + 0.4rem, 1.2rem);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="website-has-loading-element" class="hidden-marker"></div>
+
+    <main class="screen">
+      <section>
+        <div id="warning"></div>
+        <h1 class="title">Tankpreise Aktuell</h1>
+        <h2 class="subtitle">Aktuelle Benzinpreise in Deutschland</h2>
+        <div class="icon">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="64"
+            height="64"
+            fill="#000000"
+            viewBox="0 0 256 256"
+          >
+            <path
+              d="M241,69.66,221.66,50.34a8,8,0,0,0-11.32,11.32L229.66,81A8,8,0,0,1,232,86.63V168a8,8,0,0,1-16,0V128a24,24,0,0,0-24-24H176V56a24,24,0,0,0-24-24H72A24,24,0,0,0,48,56V208H32a8,8,0,0,0,0,16H192a8,8,0,0,0,0-16H176V120h16a8,8,0,0,1,8,8v40a24,24,0,0,0,48,0V86.63A23.85,23.85,0,0,0,241,69.66ZM64,208V56a8,8,0,0,1,8-8h80a8,8,0,0,1,8,8V208Zm80-96a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,112Z"
+            ></path>
+          </svg>
+        </div>
+        <div class="price-block">
+          <p class="super-e5"></p>
+          <p class="super-e10"></p>
+          <p class="diesel"></p>
+        </div>
+        <h4 id="clock">00:00</h4>
+      </section>
+    </main>
+  </body>
+
+  <script>
+    // live clock
+    const clockElement = document.getElementById("clock");
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const hh = String(now.getHours()).padStart(2, "0");
+    const mm = String(now.getMinutes()).padStart(2, "0");
+    clockElement.textContent = `${day}.${month} ${hh}:${mm}`;
+
+    // for debugging only
+    const warningElement = document.getElementById("warning");
+
+    // mark page loaded
+    const markLoaded = function () {
+      const markerLoaded = document.createElement("div");
+      markerLoaded.id = "website-has-loaded";
+      document.body.appendChild(markerLoaded);
+    };
+
+    const fetchPrices = async function (apiKey, stationId) {
+      const url = `https://creativecommons.tankerkoenig.de/json/prices.php?ids=${stationId}&apikey=${apiKey}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.ok) {
+          const stationData = data.prices[stationId];
+          if (stationData) {
+            document.querySelector(".super-e5").innerHTML =
+              `Super E5: <strong>${stationData.e5} €</strong>`;
+            document.querySelector(".super-e10").innerHTML =
+              `Super E10: <strong>${stationData.e10} €</strong>`;
+            document.querySelector(".diesel").innerHTML =
+              `Diesel: <strong>${stationData.diesel} €</strong>`;
+          } else {
+            warningElement.textContent = "Tankstelle nicht gefunden.";
+          }
+        } else {
+          warningElement.textContent =
+            "Tankerkoenig API hat folgenden Fehler zurückgegeben: " +
+            (data.message || "Unbekannter Fehler");
+        }
+      } catch (error) {
+        warningElement.textContent =
+          "Fehler beim Abrufen der Preise: " + error.message;
+      }
+    };
+
+    const fetchStationDetails = async function (apiKey, stationId) {
+      const url = `https://creativecommons.tankerkoenig.de/json/detail.php?id=${stationId}&apikey=${apiKey}`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.ok) {
+          const stationData = data.station;
+          if (stationData) {
+            console.log("Tankstellendetails:", stationData);
+            document.querySelector(".title").textContent =
+              stationData.brand + " - " + stationData.place;
+            document.querySelector(".subtitle").textContent =
+              stationData.street + " " + stationData.houseNumber;
+          } else {
+            warningElement.textContent = "Tankstelle nicht gefunden.";
+          }
+        } else {
+          warningElement.textContent =
+            "Tankerkoenig API hat folgenden Fehler zurückgegeben: " +
+            (data.message || "Unbekannter Fehler");
+        }
+      } catch (error) {
+        warningElement.textContent =
+          "Fehler beim Abrufen der Tankstellendetails: " + error.message;
+      }
+    };
+
+    // Handling Settings Page Updates
+    window.addEventListener("message", (event) => {
+      const data = event.data;
+
+      if (!data) {
+        warningElement.textContent = "Empfangene Nachricht ohne Daten.";
+        return;
+      }
+
+      const payload = data.data || {};
+
+      if (data.type === "INIT" && data.cmd === "message") {
+        if (payload.meta?.pluginSettings?.tankerkoenig_api_key) {
+          payload.meta?.pluginSettings?.tankerkoenig_api_key;
+        } else {
+          warningElement.textContent =
+            "Received INIT message without tankerkoenig_api_key in pluginSettings.";
+        }
+        if (payload.meta?.pluginSettings?.tankerkoenig_station_id) {
+          payload.meta?.pluginSettings?.tankerkoenig_station_id;
+        } else {
+          warningElement.textContent =
+            "Received INIT message without tankerkoenig_station_id in pluginSettings.";
+        }
+
+        fetchPrices(
+          payload.meta.pluginSettings.tankerkoenig_api_key,
+          payload.meta.pluginSettings.tankerkoenig_station_id,
+        );
+
+        fetchStationDetails(
+          payload.meta.pluginSettings.tankerkoenig_api_key,
+          payload.meta.pluginSettings.tankerkoenig_station_id,
+        );
+
+        markLoaded();
+      }
+    });
+  </script>
+</html>
