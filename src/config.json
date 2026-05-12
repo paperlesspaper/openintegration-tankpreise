@@ -17,6 +17,12 @@
         "type": "string",
         "description": "Die ID der Tankerkoenig-Station, für die die Preise abgerufen werden sollen.",
         "default": "your-station-id-here"
+      },
+      "timezone": {
+        "type": "string",
+        "description": "Die Zeitzone, in der die Uhrzeit angezeigt werden soll (z.B. 'Europe/Berlin').",
+        "default": "Europe/Berlin",
+        "enum": ["Europe/Berlin", "Europe/Paris", "Europe/London"]
       }
     }
   },
