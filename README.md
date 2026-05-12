@@ -1,6 +1,6 @@
 # OpenPaper Tankstellenkönig Integration
 
-This is Integration showing Gasoline-Prices on [paperlesspaper](https://paperlesspaper.de).
+This Integration is showing Gasoline-Prices on [paperlesspaper](https://paperlesspaper.de).
 
 ## Overview
 
@@ -8,8 +8,13 @@ This Integration shows gasoline prices fetched from the [tankerkönig-api](https
 
 ## How to use
 
-Inside the app select `New Image` > `Custom Integration` and enter the url:
-`https://openintegration-caldav.vercel.app/config.json`
+Inside the app select `New Image` > `Custom Integration` and enter your custom url to your config.json (e.g. tankstelle.paperlesspaper.de/config.json)
+
+1. You need to register for API Key at creativecommons.tankerkoenig.de
+2. You need to find a proper Station ID, you can search one at [your-url]/stationsnummer (e.g. tankstelle.paperlesspaper.de/stationsnummer )
+3. Add API Key and StationID to the settings of your custom Integration in the paperlesspaper app.
+4. to show correct timestamps, choose a timezone
+5. save and wait for updates of prices on your openPaper-Displays.
 
 ## Key files
 
