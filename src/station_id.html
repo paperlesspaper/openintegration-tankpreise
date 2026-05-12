@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tankerkönig – Stationen & IDs</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 2rem;
+        max-width: 900px;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      form {
+        display: grid;
+        gap: 0.75rem;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+      label {
+        display: grid;
+        gap: 0.25rem;
+        font-size: 0.95rem;
+      }
+      input,
+      select,
+      button {
+        padding: 0.5rem;
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      .row {
+        grid-column: 1 / -1;
+      }
+      .status {
+        margin: 1rem 0;
+        font-size: 0.95rem;
+      }
+      ul {
+        padding-left: 1.25rem;
+      }
+      li {
+        margin: 0.4rem 0;
+      }
+      code {
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Stationen in der Umgebung (Tankerkönig)</h1>
+
+    <form id="searchForm">
+      <label>
+        API-Key
+        <input
+          id="apiKey"
+          type="text"
+          placeholder="Dein Tankerkönig API-Key"
+          required
+        />
+      </label>
+
+      <label>
+        Latitude
+        <input
+          id="lat"
+          type="number"
+          step="any"
+          placeholder="z. B. 52.5200"
+          required
+        />
+      </label>
+
+      <label>
+        Longitude
+        <input
+          id="lng"
+          type="number"
+          step="any"
+          placeholder="z. B. 13.4050"
+          required
+        />
+      </label>
+
+      <label>
+        Radius (km)
+        <input id="rad" type="number" min="1" max="25" value="5" required />
+      </label>
+
+      <label>
+        Kraftstoff
+        <select id="type">
+          <option value="all">alle</option>
+          <option value="e5">e5</option>
+          <option value="e10">e10</option>
+          <option value="diesel">diesel</option>
+        </select>
+      </label>
+
+      <div class="row">
+        <button type="submit">Stationen laden</button>
+        <button type="button" id="geoBtn">Standort verwenden</button>
+      </div>
+    </form>
+
+    <p class="status" id="status">Bereit.</p>
+    <ul id="stations"></ul>
+
+    <script>
+      const form = document.getElementById("searchForm");
+      const statusEl = document.getElementById("status");
+      const stationsEl = document.getElementById("stations");
+
+      const apiKeyEl = document.getElementById("apiKey");
+      const latEl = document.getElementById("lat");
+      const lngEl = document.getElementById("lng");
+      const radEl = document.getElementById("rad");
+      const typeEl = document.getElementById("type");
+      const geoBtn = document.getElementById("geoBtn");
+
+      function setStatus(msg) {
+        statusEl.textContent = msg;
+      }
+
+      function renderStations(stations) {
+        stationsEl.innerHTML = "";
+        if (!stations || stations.length === 0) {
+          const li = document.createElement("li");
+          li.textContent = "Keine Stationen gefunden.";
+          stationsEl.appendChild(li);
+          return;
+        }
+
+        stations.forEach((s) => {
+          const li = document.createElement("li");
+          li.innerHTML = `<strong>${s.name ?? "Unbekannt"}</strong> — ID: <code>${s.id}</code>`;
+          stationsEl.appendChild(li);
+        });
+      }
+
+      async function loadStations() {
+        const key = apiKeyEl.value.trim();
+        const lat = latEl.value.trim();
+        const lng = lngEl.value.trim();
+        const rad = radEl.value.trim();
+        const type = typeEl.value;
+
+        if (!key || !lat || !lng || !rad) {
+          setStatus("Bitte alle Felder ausfüllen.");
+          return;
+        }
+
+        const url = new URL(
+          "https://creativecommons.tankerkoenig.de/json/list.php",
+        );
+        url.searchParams.set("lat", lat);
+        url.searchParams.set("lng", lng);
+        url.searchParams.set("rad", rad);
+        url.searchParams.set("sort", "dist");
+        url.searchParams.set("type", type);
+        url.searchParams.set("apikey", key);
+
+        setStatus("Lade Stationen ...");
+
+        try {
+          const res = await fetch(url.toString());
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+
+          if (!data.ok) {
+            throw new Error(data.message || "API-Fehler");
+          }
+
+          renderStations(data.stations);
+          setStatus(`${data.stations.length} Station(en) gefunden.`);
+        } catch (err) {
+          setStatus(`Fehler: ${err.message}`);
+          stationsEl.innerHTML = "";
+        }
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        loadStations();
+      });
+
+      geoBtn.addEventListener("click", () => {
+        if (!navigator.geolocation) {
+          setStatus("Geolocation wird nicht unterstützt.");
+          return;
+        }
+
+        setStatus("Ermittle Standort ...");
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            latEl.value = pos.coords.latitude.toFixed(6);
+            lngEl.value = pos.coords.longitude.toFixed(6);
+            setStatus("Standort übernommen.");
+          },
+          (err) => setStatus(`Standortfehler: ${err.message}`),
+        );
+      });
+    </script>
+  </body>
+</html>
